@@ -2,6 +2,8 @@ package route
 
 import (
 	"net/http"
+
+	"atlas-api/controllers"
 )
 
 // Route is a struct contating the name,
@@ -17,4 +19,11 @@ type Route struct {
 // Routes holds an array of of type Route
 type Routes []Route
 
-var routes = Routes{}
+var routes = Routes{
+	Route{
+		"Authentication",
+		"POST",
+		"/api/authenticate",
+		controllers.Authenticate,
+	},
+}
