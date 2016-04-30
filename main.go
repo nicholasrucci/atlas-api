@@ -13,7 +13,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	db.Migrate(database)
+
+	err = database.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	router := route.NewRouter()
 
