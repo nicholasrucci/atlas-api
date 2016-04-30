@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"atlas-api/config/db"
+	"atlas-api/db"
 	"atlas-api/route"
 )
 
