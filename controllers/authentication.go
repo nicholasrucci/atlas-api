@@ -40,7 +40,7 @@ func Authenticate(rw http.ResponseWriter, req *http.Request) {
 	err = json.Unmarshal(body, &data)
 	if err != nil {
 		rw.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		rw.WriteHeader(422)
+		rw.WriteHeader(http.StatusBadRequest)
 		// TODO: Handle error correctly
 		return
 	}
@@ -52,17 +52,18 @@ func Authenticate(rw http.ResponseWriter, req *http.Request) {
 
 	if err = database.Where("email = ?", data.Email).Find(&user).Error; err != nil {
 		rw.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		rw.WriteHeader(404)
+		rw.WriteHeader(http.StatusNotFound)
 		database.Close()
 		// TODO: Handle error correctly
 		return
 	}
 
+	database.Close()
+
 	err = middleware.Compare(data.Password, user)
 	if err != nil {
 		rw.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		rw.WriteHeader(404)
-		database.Close()
+		rw.WriteHeader(http.StatusNotFound)
 		// TODO: Handle error correctly
 		return
 	}
