@@ -58,6 +58,15 @@ func Authenticate(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	err = middleware.Compare(data.Password, user)
+	if err != nil {
+		rw.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		rw.WriteHeader(404)
+		database.Close()
+		// TODO: Handle error correctly
+		return
+	}
+
 	middleware.JSONHandler(rw, req)
 	err = json.NewEncoder(rw).Encode(data)
 	if err != nil {
