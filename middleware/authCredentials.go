@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 
+	"atlas-api/config/db"
 	"golang.org/x/crypto/scrypt"
 )
 
@@ -47,13 +48,13 @@ func CreateCredentials(password string) (Credentials, error) {
 
 // Compare will hash the password and then compare it to the
 // credentials that were passed down with it
-func Compare(password string, c Credentials) error {
-	hash, err := scrypt.Key([]byte(password), []byte(c.salt), 1<<14, 8, 1, PasswordHashBytes)
+func Compare(password string, user db.User) error {
+	hash, err := scrypt.Key([]byte(password), []byte(user.PasswordSalt), 1<<14, 8, 1, PasswordHashBytes)
 	if err != nil {
 		return err
 	}
 
-	if hex.EncodeToString(hash) == c.hash {
+	if hex.EncodeToString(hash) == user.PasswordHash {
 		return nil
 	}
 	return errors.New("Invalid credentials")
