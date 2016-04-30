@@ -7,8 +7,8 @@ import (
 	"log"
 	"net/http"
 
-	"atlas-api/config/db"
 	"atlas-api/config/schema"
+	"atlas-api/db"
 	"atlas-api/middleware"
 )
 
