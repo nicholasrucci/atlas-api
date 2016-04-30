@@ -54,7 +54,7 @@ func Authenticate(rw http.ResponseWriter, req *http.Request) {
 		rw.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		rw.WriteHeader(404)
 		database.Close()
-		// TODO: Handle error corretly
+		// TODO: Handle error correctly
 		return
 	}
 
