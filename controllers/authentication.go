@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"atlas-api/config/db"
+	"atlas-api/config/schema"
 	"atlas-api/middleware"
 )
 
@@ -25,7 +26,7 @@ type AuthenticatePostData struct {
 // salt and compare the two.
 func Authenticate(rw http.ResponseWriter, req *http.Request) {
 	var data AuthenticatePostData
-	var user db.User
+	var user schema.User
 
 	body, err := ioutil.ReadAll(io.LimitReader(req.Body, 1048576))
 	if err != nil {
