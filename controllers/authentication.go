@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 
+	"atlas-api/config/db"
 	"atlas-api/middleware"
 )
 
@@ -24,6 +25,7 @@ type AuthenticatePostData struct {
 // salt and compare the two.
 func Authenticate(rw http.ResponseWriter, req *http.Request) {
 	var data AuthenticatePostData
+	var user db.User
 
 	body, err := ioutil.ReadAll(io.LimitReader(req.Body, 1048576))
 	if err != nil {
@@ -39,6 +41,21 @@ func Authenticate(rw http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		rw.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		rw.WriteHeader(422)
+		// TODO: Handle error correctly
+		return
+	}
+
+	database, err := db.Connection()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err = database.Where("email = ?", data.Email).Find(&user).Error; err != nil {
+		rw.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		rw.WriteHeader(404)
+		database.Close()
+		// TODO: Handle error corretly
+		return
 	}
 
 	middleware.JSONHandler(rw, req)
