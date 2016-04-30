@@ -14,6 +14,8 @@ func main() {
 		log.Fatal(err)
 	}
 	db.Migrate(database)
+
 	router := route.NewRouter()
+
 	log.Fatal(http.ListenAndServe(":3000", router))
 }
