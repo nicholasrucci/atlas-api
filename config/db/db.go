@@ -1,6 +1,8 @@
 package db
 
 import (
+	"atlas-api/config/schema"
+
 	"github.com/jinzhu/gorm"
 
 	// dialect for gorm
@@ -17,5 +19,5 @@ func Connection() (*gorm.DB, error) {
 // Migrate will go through each of the tables and migrate
 // them if they have not yet been migrated
 func Migrate(db *gorm.DB) {
-	db.AutoMigrate(&User{})
+	db.AutoMigrate(&schema.User{})
 }
