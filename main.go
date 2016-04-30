@@ -1,14 +1,12 @@
 package main
 
 import (
-	"net/http"
 	"log"
+	"net/http"
 
-	"atlas-api/route"
 	"atlas-api/config/db"
+	"atlas-api/route"
 )
-
-
 
 func main() {
 	database, err := db.Connection()
