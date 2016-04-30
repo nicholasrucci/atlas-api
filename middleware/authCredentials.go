@@ -3,6 +3,7 @@ package middleware
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"errors"
 	"io"
 
 	"golang.org/x/crypto/scrypt"
@@ -42,4 +43,18 @@ func CreateCredentials(password string) (Credentials, error) {
 	credentials.salt = hex.EncodeToString(salt)
 
 	return credentials, err
+}
+
+// Compare will hash the password and then compare it to the
+// credentials that were passed down with it
+func Compare(password string, c Credentials) error {
+	hash, err := scrypt.Key([]byte(password), []byte(c.salt), 1<<14, 8, 1, PasswordHashBytes)
+	if err != nil {
+		return err
+	}
+
+	if hex.EncodeToString(hash) == c.hash {
+		return nil
+	}
+	return errors.New("Invalid credentials")
 }
