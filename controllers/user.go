@@ -35,7 +35,13 @@ func CreateUser(rw http.ResponseWriter, req *http.Request) {
 
 	if err := json.Unmarshal(body, &userReq); err != nil {
 		middleware.JSONHandler(rw, req)
+
 		rw.WriteHeader(422)
+		err = json.NewEncoder(rw).Encode(err)
+		if err != nil {
+			log.Fatal(err)
+		}
+		return
 	}
 
 	credentials, err = middleware.CreateCredentials(userReq.Password)
@@ -49,9 +55,21 @@ func CreateUser(rw http.ResponseWriter, req *http.Request) {
 	user.PasswordHash = credentials.Hash
 	user.PasswordSalt = credentials.Salt
 
-	db.DB.Create(&user)
+	if err := db.DB.Create(&user).Error; err != nil {
+		dbError := schema.DBClientError(err)
+
+		middleware.JSONHandler(rw, req)
+
+		rw.WriteHeader(400)
+		err = json.NewEncoder(rw).Encode(dbError)
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
+		return
+	}
 
 	middleware.JSONHandler(rw, req)
+	json.NewEncoder(rw).Encode(http.StatusAccepted)
 	rw.WriteHeader(200)
 
 }
