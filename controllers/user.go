@@ -62,9 +62,9 @@ func CreateUser(rw http.ResponseWriter, req *http.Request) {
 
 		rw.WriteHeader(400)
 		err = json.NewEncoder(rw).Encode(dbError)
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
+		if err != nil {
+			log.Fatal(err)
+		}
 		return
 	}
 
