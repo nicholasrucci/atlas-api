@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/jinzhu/gorm"
+	"github.com/satori/go.uuid"
 )
 
 // User schema
@@ -15,6 +16,12 @@ type User struct {
 	PasswordHash string `gorm:"size:255"`
 	PasswordSalt string `gorm:"size:255"`
 	Disabled     bool
+}
+
+// BeforeCreate assigns a UUID for the user before creation
+func (user *User) BeforeCreate(scope *gorm.Scope) error {
+	scope.SetColumn("ID", uuid.NewV4())
+	return nil
 }
 
 // Organization schema
