@@ -9,11 +9,14 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-// Connection will open the applications database and return
+var DB *gorm.DB
+
+// InitializeConnection will open the applications database and return
 // it and a possible error
-func Connection() (*gorm.DB, error) {
-	db, err := gorm.Open("mysql", "root:@/atlas?charset=utf8&parseTime=True&loc=Local")
-	return db, err
+func InitializeConnection() error {
+	var err error
+	DB, err = gorm.Open("mysql", "root:@/atlas?charset=utf8&parseTime=True&loc=Local")
+	return err
 }
 
 // Migrate will go through each of the tables and migrate
