@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"atlas-api/config/schema"
 	"atlas-api/db"
 	"atlas-api/route"
 )
@@ -13,6 +14,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	db.DB.AutoMigrate(&schema.User{}, &schema.Organization{}, &schema.Page{}, &schema.Platform{}, &schema.Task{}, &schema.Group{})
 
 	router := route.NewRouter()
 
