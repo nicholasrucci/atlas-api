@@ -13,8 +13,8 @@ import (
 // Credentials is a struct that will be returned from the methods below
 // containing the salt and hash of a password
 type Credentials struct {
-	salt string
-	hash string
+	Salt string
+	Hash string
 }
 
 var (
@@ -40,8 +40,8 @@ func CreateCredentials(password string) (Credentials, error) {
 		return credentials, err
 	}
 
-	credentials.hash = hex.EncodeToString(hash)
-	credentials.salt = hex.EncodeToString(salt)
+	credentials.Hash = hex.EncodeToString(hash)
+	credentials.Salt = hex.EncodeToString(salt)
 
 	return credentials, err
 }
