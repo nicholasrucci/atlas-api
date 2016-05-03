@@ -38,26 +38,28 @@ func Authenticate(rw http.ResponseWriter, req *http.Request) {
 		log.Fatal(err)
 	}
 
-	err = json.Unmarshal(body, &data)
-	if err != nil {
-		middleware.JSONHandler(rw, req)
-		rw.WriteHeader(http.StatusBadRequest)
-		// TODO: Handle error correctly (JSON)
+	if err = json.Unmarshal(body, &data); err != nil {
+		middleware.HandleError(rw, req, 500, err)
+		if err != nil {
+			log.Fatal(err)
+		}
 		return
 	}
 
 	if err = db.DB.Where("email = ?", data.Email).Find(&user).Error; err != nil {
-		middleware.JSONHandler(rw, req)
-		rw.WriteHeader(http.StatusNotFound)
-		// TODO: Handle error correctly (JSON)
+		middleware.HandleError(rw, req, 400, err)
+		if err != nil {
+			log.Fatal(err)
+		}
 		return
 	}
 
 	err = middleware.Compare(data.Password, user)
 	if err != nil {
-		middleware.JSONHandler(rw, req)
-		rw.WriteHeader(http.StatusNotFound)
-		// TODO: Handle error correctly (JSON)
+		err = middleware.HandleError(rw, req, 500, err)
+		if err != nil {
+			log.Fatal(err)
+		}
 		return
 	}
 

@@ -57,20 +57,13 @@ func CreateUser(rw http.ResponseWriter, req *http.Request) {
 
 	if err := db.DB.Create(&user).Error; err != nil {
 
-		dbError := middleware.HandleError(400, err)
-
-		middleware.JSONHandler(rw, req)
-		rw.WriteHeader(400)
-
-		err = json.NewEncoder(rw).Encode(dbError)
+		err = middleware.HandleError(rw, req, 400, err)
 		if err != nil {
 			log.Fatal(err)
 		}
+
 		return
 	}
 
-	middleware.JSONHandler(rw, req)
-	json.NewEncoder(rw).Encode(middleware.HandleError(200, nil))
-	rw.WriteHeader(200)
-
+	middleware.HandleError(rw, req, 200, nil)
 }
