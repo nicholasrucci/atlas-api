@@ -9,14 +9,7 @@ import (
 )
 
 func main() {
-	database, err := db.Connection()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	db.Migrate(database)
-
-	err = database.Close()
+	err := db.InitializeConnection()
 	if err != nil {
 		log.Fatal(err)
 	}

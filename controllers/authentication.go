@@ -40,36 +40,29 @@ func Authenticate(rw http.ResponseWriter, req *http.Request) {
 
 	err = json.Unmarshal(body, &data)
 	if err != nil {
-		rw.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		middleware.JSONHandler(rw, req)
 		rw.WriteHeader(http.StatusBadRequest)
-		// TODO: Handle error correctly
+		// TODO: Handle error correctly (JSON)
 		return
 	}
 
-	database, err := db.Connection()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if err = database.Where("email = ?", data.Email).Find(&user).Error; err != nil {
-		rw.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	if err = db.DB.Where("email = ?", data.Email).Find(&user).Error; err != nil {
+		middleware.JSONHandler(rw, req)
 		rw.WriteHeader(http.StatusNotFound)
-		database.Close()
-		// TODO: Handle error correctly
+		// TODO: Handle error correctly (JSON)
 		return
 	}
-
-	database.Close()
 
 	err = middleware.Compare(data.Password, user)
 	if err != nil {
-		rw.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		middleware.JSONHandler(rw, req)
 		rw.WriteHeader(http.StatusNotFound)
-		// TODO: Handle error correctly
+		// TODO: Handle error correctly (JSON)
 		return
 	}
 
 	middleware.JSONHandler(rw, req)
+	rw.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(rw).Encode(data)
 	if err != nil {
 		log.Fatal(err)
