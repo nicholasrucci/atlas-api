@@ -2,8 +2,7 @@ package middleware
 
 import ()
 
-// DatabaseError will hold the data that is responded to the user when the
-// database returns an error
+// JSONError will hold the data that is responded to the client
 type JSONError struct {
 	Code  int
 	Error error
