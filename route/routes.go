@@ -26,4 +26,10 @@ var routes = Routes{
 		"/api/authenticate",
 		controllers.Authenticate,
 	},
+	Route{
+		"CreateUser",
+		"POST",
+		"/api/users/new",
+		controllers.CreateUser,
+	},
 }
