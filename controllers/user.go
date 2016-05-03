@@ -56,11 +56,12 @@ func CreateUser(rw http.ResponseWriter, req *http.Request) {
 	user.PasswordSalt = credentials.Salt
 
 	if err := db.DB.Create(&user).Error; err != nil {
-		dbError := schema.DBClientError(err)
+
+		dbError := middleware.HandleError(400, err)
 
 		middleware.JSONHandler(rw, req)
-
 		rw.WriteHeader(400)
+
 		err = json.NewEncoder(rw).Encode(dbError)
 		if err != nil {
 			log.Fatal(err)
@@ -69,7 +70,7 @@ func CreateUser(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	middleware.JSONHandler(rw, req)
-	json.NewEncoder(rw).Encode(http.StatusAccepted)
+	json.NewEncoder(rw).Encode(middleware.HandleError(200, nil))
 	rw.WriteHeader(200)
 
 }
