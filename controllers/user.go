@@ -9,9 +9,10 @@ import (
 
 	"atlas-api/config/schema"
 	"atlas-api/db"
-	"atlas-api/middleware"
+	"atlas-api/helpers"
 )
 
+// UserReq ...
 type UserReq struct {
 	FirstName string
 	LastName  string
@@ -23,7 +24,7 @@ type UserReq struct {
 func CreateUser(rw http.ResponseWriter, req *http.Request) {
 	var user schema.User
 	var userReq UserReq
-	var credentials middleware.Credentials
+	var credentials helper.Credentials
 
 	body, err := ioutil.ReadAll(io.LimitReader(req.Body, 1048576))
 	if err != nil {
@@ -34,7 +35,7 @@ func CreateUser(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	if err := json.Unmarshal(body, &userReq); err != nil {
-		middleware.JSONHandler(rw, req)
+		helper.JSONHandler(rw, req)
 
 		rw.WriteHeader(422)
 		err = json.NewEncoder(rw).Encode(err)
@@ -44,7 +45,7 @@ func CreateUser(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	credentials, err = middleware.CreateCredentials(userReq.Password)
+	credentials, err = helper.CreateCredentials(userReq.Password)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -57,7 +58,7 @@ func CreateUser(rw http.ResponseWriter, req *http.Request) {
 
 	if err := db.DB.Create(&user).Error; err != nil {
 
-		err = middleware.HandleError(rw, req, 400, err)
+		err = helper.HandleError(rw, req, 400, err)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -65,5 +66,5 @@ func CreateUser(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	middleware.HandleError(rw, req, 200, nil)
+	helper.HandleError(rw, req, 200, nil)
 }

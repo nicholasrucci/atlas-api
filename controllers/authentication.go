@@ -9,7 +9,7 @@ import (
 
 	"atlas-api/config/schema"
 	"atlas-api/db"
-	"atlas-api/middleware"
+	"atlas-api/helpers"
 )
 
 // AuthenticatePostData will hold the email and password of the request
@@ -39,31 +39,21 @@ func Authenticate(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	if err = json.Unmarshal(body, &data); err != nil {
-		middleware.HandleError(rw, req, 500, err)
-		if err != nil {
-			log.Fatal(err)
-		}
+		helper.HandleError(rw, req, 500, err)
 		return
 	}
 
 	if err = db.DB.Where("email = ?", data.Email).Find(&user).Error; err != nil {
-		middleware.HandleError(rw, req, 400, err)
-		if err != nil {
-			log.Fatal(err)
-		}
+		helper.HandleError(rw, req, 400, err)
 		return
 	}
 
-	err = middleware.Compare(data.Password, user)
-	if err != nil {
-		err = middleware.HandleError(rw, req, 500, err)
-		if err != nil {
-			log.Fatal(err)
-		}
+	if err = helper.Compare(data.Password, user); err != nil {
+		helper.HandleError(rw, req, 500, err)
 		return
 	}
 
-	middleware.JSONHandler(rw, req)
+	helper.JSONHandler(rw, req)
 	rw.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(rw).Encode(data)
 	if err != nil {
