@@ -32,4 +32,10 @@ var routes = Routes{
 		"/api/users/new",
 		controllers.CreateUser,
 	},
+	Route{
+		"CreateOrganizaiton",
+		"POST",
+		"/api/organization/new",
+		controllers.CreateOrganization,
+	},
 }
