@@ -39,7 +39,8 @@ type Project struct {
 	Client         string `gorm:"size:255"`
 	SlackChannel   string `gorm:"size:255"`
 	StartDate      string `gorm:"size:255"`
-	OrganizationID int
+	OrganizationID int    `sql:"type:int(11) references organizations(id)"`
+	Organization   Organization
 	Platforms      []Platform `gorm:"ForeignKey:ProjectID;AssociationForeignKey:Refer"`
 	Pages          []Page     `gorm:"ForeignKey:ProjectID;AssociationForeignKey:Refer"`
 	Tasks          []Task     `gorm:"ForeignKey:ProjectID;AssociationForeignKey:Refer"`

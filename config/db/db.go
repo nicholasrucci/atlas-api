@@ -1,19 +1,28 @@
 package db
 
 import (
-	"github.com/jinzhu/gorm"
+	"database/sql"
+	"log"
 
-	// dialect for gorm
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/DavidHuie/gomigrate"
+	"github.com/Sirupsen/logrus"
+	_ "github.com/lib/pq"
 )
 
-// DB is the global database
-var DB *gorm.DB
+func init() {
+	db, err := sql.Open("postgres", "user=nicholasrucci dbname=atlas sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
 
-// InitializeConnection will open the applications database and return
-// it and a possible error
-func InitializeConnection() error {
-	var err error
-	DB, err = gorm.Open("mysql", "root:@/atlas?charset=utf8&parseTime=True&loc=Local")
-	return err
+	migrator, err := gomigrate.NewMigratorWithLogger(db, gomigrate.Postgres{}, "./config/db/migrations", logrus.New())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = migrator.Migrate()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
