@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	"atlas-api/config/db"
+	// "atlas-api/config/db"
 	"atlas-api/config/schema"
 	"atlas-api/helpers"
 )
@@ -45,23 +45,21 @@ func CreateProject(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	db.DB.Model(&project).Related(&schema.Organization{})
-
 	project.Name = projectReq.Name
 	project.Client = projectReq.Client
 	project.SlackChannel = projectReq.SlackChannel
 	project.StartDate = projectReq.StartDate
 	project.OrganizationID = projectReq.OrganizationID
 
-	if err := db.DB.Create(&project).Error; err != nil {
-
-		err = helper.HandleError(rw, req, 400, err)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		return
-	}
+	// if err := db.DB.Create(&project).Error; err != nil {
+	//
+	// 	err = helper.HandleError(rw, req, 400, err)
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	//
+	// 	return
+	// }
 
 	helper.HandleError(rw, req, 200, nil)
 }

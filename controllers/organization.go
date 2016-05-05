@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	"atlas-api/config/db"
+	// "atlas-api/config/db"
 	"atlas-api/config/schema"
 	"atlas-api/helpers"
 )
@@ -49,15 +49,15 @@ func CreateOrganization(rw http.ResponseWriter, req *http.Request) {
 	organization.ContactEmail = organizationReq.ContactEmail
 	organization.ContactPhone = organizationReq.ContactPhone
 
-	if err := db.DB.Create(&organization).Error; err != nil {
-
-		err = helper.HandleError(rw, req, 400, err)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		return
-	}
-
+	// if err := db.DB.Create(&organization).Error; err != nil {
+	//
+	// 	err = helper.HandleError(rw, req, 400, err)
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	//
+	// 	return
+	// }
+	//
 	helper.HandleError(rw, req, 200, nil)
 }

@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	"atlas-api/config/db"
+	// "atlas-api/config/db"
 	"atlas-api/config/schema"
 	"atlas-api/helpers"
 )
@@ -43,10 +43,10 @@ func Authenticate(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if err = db.DB.Where("email = ?", data.Email).Find(&user).Error; err != nil {
-		helper.HandleError(rw, req, 400, err)
-		return
-	}
+	// if err = db.DB.Where("email = ?", data.Email).Find(&user).Error; err != nil {
+	// 	helper.HandleError(rw, req, 400, err)
+	// 	return
+	// }
 
 	if err = helper.Compare(data.Password, user); err != nil {
 		helper.HandleError(rw, req, 500, err)

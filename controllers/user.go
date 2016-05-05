@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	"atlas-api/config/db"
+	// "atlas-api/config/db"
 	"atlas-api/config/schema"
 	"atlas-api/helpers"
 )
@@ -56,15 +56,15 @@ func CreateUser(rw http.ResponseWriter, req *http.Request) {
 	user.PasswordHash = credentials.Hash
 	user.PasswordSalt = credentials.Salt
 
-	if err := db.DB.Create(&user).Error; err != nil {
-
-		err = helper.HandleError(rw, req, 400, err)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		return
-	}
+	// if err := db.DB.Create(&user).Error; err != nil {
+	//
+	// 	err = helper.HandleError(rw, req, 400, err)
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	//
+	// 	return
+	// }
 
 	helper.HandleError(rw, req, 200, nil)
 }
