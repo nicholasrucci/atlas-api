@@ -35,7 +35,13 @@ var routes = Routes{
 	Route{
 		"CreateOrganizaiton",
 		"POST",
-		"/api/organization/new",
+		"/api/organizations/new",
 		controllers.CreateOrganization,
+	},
+	Route{
+		"CreateProject",
+		"POST",
+		"/api/projects/new",
+		controllers.CreateProject,
 	},
 }
