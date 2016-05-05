@@ -15,7 +15,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	db.DB.AutoMigrate(&schema.User{}, &schema.Organization{}, &schema.Page{}, &schema.Platform{}, &schema.Task{}, &schema.Group{})
+	db.DB.AutoMigrate(&schema.User{}, &schema.Organization{}, &schema.Project{}, &schema.Page{}, &schema.Platform{}, &schema.Task{}, &schema.Group{})
 
 	router := route.NewRouter()
 
