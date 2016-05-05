@@ -1,8 +1,6 @@
 package schema
 
 import (
-	"time"
-
 	"github.com/jinzhu/gorm"
 	"github.com/satori/go.uuid"
 )
@@ -37,15 +35,16 @@ type Organization struct {
 // Project schema
 type Project struct {
 	gorm.Model
-	Name         string `gorm:"size:255"`
-	Client       string `gorm:"size:255"`
-	SlackChannel string `gorm:"size:255"`
-	StartDate    time.Time
-	Platforms    []Platform `gorm:"ForeignKey:ProjectID;AssociationForeignKey:Refer"`
-	Pages        []Page     `gorm:"ForeignKey:ProjectID;AssociationForeignKey:Refer"`
-	Tasks        []Task     `gorm:"ForeignKey:ProjectID;AssociationForeignKey:Refer"`
-	Roles        []Role     `gorm:"ForeignKey:ProjectID;AssociationForeignKey:Refer"`
-	Groups       []Group    `gorm:"ForeignKey:ProjectID;AssociationForeignKey:Refer"`
+	Name           string `gorm:"size:255"`
+	Client         string `gorm:"size:255"`
+	SlackChannel   string `gorm:"size:255"`
+	StartDate      string `gorm:"size:255"`
+	OrganizationID int
+	Platforms      []Platform `gorm:"ForeignKey:ProjectID;AssociationForeignKey:Refer"`
+	Pages          []Page     `gorm:"ForeignKey:ProjectID;AssociationForeignKey:Refer"`
+	Tasks          []Task     `gorm:"ForeignKey:ProjectID;AssociationForeignKey:Refer"`
+	Roles          []Role     `gorm:"ForeignKey:ProjectID;AssociationForeignKey:Refer"`
+	Groups         []Group    `gorm:"ForeignKey:ProjectID;AssociationForeignKey:Refer"`
 }
 
 // Platform schema
