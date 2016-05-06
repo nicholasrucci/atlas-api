@@ -1,79 +1,62 @@
 package schema
 
-import (
-	"github.com/jinzhu/gorm"
-	"github.com/satori/go.uuid"
-)
+import ()
 
 // User schema
 type User struct {
-	gorm.Model
-	FirstName    string `gorm:"size:255"`
-	LastName     string `gorm:"size:255"`
-	Email        string `gorm:"type:varchar(100);unique"`
-	PasswordHash string `gorm:"size:255"`
-	PasswordSalt string `gorm:"size:255"`
+	FirstName    string
+	LastName     string
+	Email        string
+	PasswordHash string
+	PasswordSalt string
 	Disabled     bool
-}
-
-// BeforeCreate assigns a UUID for the user before creation
-func (user *User) BeforeCreate(scope *gorm.Scope) error {
-	scope.SetColumn("ID", uuid.NewV4())
-	return nil
 }
 
 // Organization schema
 type Organization struct {
-	gorm.Model
-	TeamName     string    `gorm:"size:255"`
-	ContactName  string    `gorm:"size:255"`
-	ContactEmail string    `gorm:"size:255"`
-	ContactPhone string    `gorm:"size:255"`
-	Projects     []Project `gorm:"ForeignKey:OrganizationID;AssociationForeignKey:Refer"`
+	TeamName     string
+	ContactName  string
+	ContactEmail string
+	ContactPhone string
+	Projects     []Project
 }
 
 // Project schema
 type Project struct {
-	gorm.Model
-	Name           string `gorm:"size:255"`
-	Client         string `gorm:"size:255"`
-	SlackChannel   string `gorm:"size:255"`
-	StartDate      string `gorm:"size:255"`
-	OrganizationID int    `sql:"type:int(11) references organizations(id)"`
+	Name           string
+	Client         string
+	SlackChannel   string
+	StartDate      string
+	OrganizationID int
 	Organization   Organization
-	Platforms      []Platform `gorm:"ForeignKey:ProjectID;AssociationForeignKey:Refer"`
-	Pages          []Page     `gorm:"ForeignKey:ProjectID;AssociationForeignKey:Refer"`
-	Tasks          []Task     `gorm:"ForeignKey:ProjectID;AssociationForeignKey:Refer"`
-	Roles          []Role     `gorm:"ForeignKey:ProjectID;AssociationForeignKey:Refer"`
-	Groups         []Group    `gorm:"ForeignKey:ProjectID;AssociationForeignKey:Refer"`
+	Platforms      []Platform
+	Pages          []Page
+	Tasks          []Task
+	Roles          []Role
+	Groups         []Group
 }
 
 // Platform schema
 type Platform struct {
-	gorm.Model
-	Name string `gorm:"size:255"`
+	Name string
 }
 
 // Page schema
 type Page struct {
-	gorm.Model
-	Name string `gorm:"size:255"`
+	Name string
 }
 
 // Task schema
 type Task struct {
-	gorm.Model
-	Name string `gorm:"size:255"`
+	Name string
 }
 
 // Role schema
 type Role struct {
-	gorm.Model
-	Name string `gorm:"size:255"`
+	Name string
 }
 
 // Group schema
 type Group struct {
-	gorm.Model
-	Name string `gorm:"size:255"`
+	Name string
 }
