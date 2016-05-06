@@ -61,15 +61,18 @@ func CreateUser(rw http.ResponseWriter, req *http.Request) {
 		log.Fatal(err)
 	}
 
-	log.Print(database)
-
-	// 	err = helper.HandleError(rw, req, 400, err)
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	//
-	// 	return
-	// }
+	_, err = database.Query("INSERT INTO users(first_name, last_name, email, password_hash, password_salt, disabled) VALUES($1, $2, $3, $4, $5, $6)",
+		user.FirstName,
+		user.LastName,
+		user.Email,
+		user.PasswordHash,
+		user.PasswordSalt,
+		false,
+	)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
 
 	helper.HandleError(rw, req, 200, nil)
 }
