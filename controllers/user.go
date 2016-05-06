@@ -74,5 +74,9 @@ func CreateUser(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	if err != nil {
+		database.Close()
+	}
+
 	helper.HandleError(rw, req, 200, nil)
 }
