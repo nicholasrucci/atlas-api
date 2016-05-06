@@ -12,10 +12,10 @@ func Connection() (*sql.DB, error) {
 		defer db.Close()
 		return nil, err
 	}
-	defer db.Close()
 
 	err = db.Ping()
 	if err != nil {
+		defer db.Close()
 		return db, err
 	}
 	return db, err
