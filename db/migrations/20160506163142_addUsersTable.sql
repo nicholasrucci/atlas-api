@@ -8,7 +8,7 @@ CREATE TABLE users (
   email varchar(100) unique,
   password_hash varchar(255),
   password_salt varchar(255),
-  diabled boolean
+  disabled boolean
 );
 
 
