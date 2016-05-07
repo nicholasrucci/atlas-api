@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 
 	// "atlas-api/config/db"
@@ -28,20 +27,16 @@ func CreateProject(rw http.ResponseWriter, req *http.Request) {
 
 	body, err := ioutil.ReadAll(io.LimitReader(req.Body, 1048576))
 	if err != nil {
-		log.Fatal(err)
+		helper.ProjectResponse(rw, req, 200, project, nil)
+		return
 	}
 	if err := req.Body.Close(); err != nil {
-		log.Fatal(err)
+		helper.ProjectResponse(rw, req, 200, project, nil)
+		return
 	}
 
 	if err := json.Unmarshal(body, &projectReq); err != nil {
-		helper.JSONHandler(rw, req)
-
-		rw.WriteHeader(422)
-		err = json.NewEncoder(rw).Encode(err)
-		if err != nil {
-			log.Fatal(err)
-		}
+		helper.ProjectResponse(rw, req, 200, project, nil)
 		return
 	}
 
@@ -61,5 +56,5 @@ func CreateProject(rw http.ResponseWriter, req *http.Request) {
 	// 	return
 	// }
 
-	helper.HandleError(rw, req, 200, nil)
+	helper.ProjectResponse(rw, req, 200, project, nil)
 }
