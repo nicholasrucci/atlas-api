@@ -7,8 +7,8 @@ import (
 	"log"
 	"net/http"
 
-	// "atlas-api/config/db"
 	"atlas-api/config/schema"
+	"atlas-api/db"
 	"atlas-api/helpers"
 )
 
@@ -22,25 +22,23 @@ type OrganizationReq struct {
 
 // CreateOrganization will create a new project
 func CreateOrganization(rw http.ResponseWriter, req *http.Request) {
-	var organizationReq OrganizationReq
-	var organization schema.Organization
+	var (
+		organizationReq OrganizationReq
+		organization    schema.Organization
+	)
 
 	body, err := ioutil.ReadAll(io.LimitReader(req.Body, 1048576))
 	if err != nil {
-		log.Fatal(err)
+		helper.OrganizationResponse(rw, req, 200, organization, nil)
+		return
 	}
 	if err := req.Body.Close(); err != nil {
-		log.Fatal(err)
+		helper.OrganizationResponse(rw, req, 200, organization, nil)
+		return
 	}
 
 	if err := json.Unmarshal(body, &organizationReq); err != nil {
-		helper.JSONHandler(rw, req)
-
-		rw.WriteHeader(422)
-		err = json.NewEncoder(rw).Encode(err)
-		if err != nil {
-			log.Fatal(err)
-		}
+		helper.OrganizationResponse(rw, req, 200, organization, nil)
 		return
 	}
 
@@ -49,15 +47,26 @@ func CreateOrganization(rw http.ResponseWriter, req *http.Request) {
 	organization.ContactEmail = organizationReq.ContactEmail
 	organization.ContactPhone = organizationReq.ContactPhone
 
-	// if err := db.DB.Create(&organization).Error; err != nil {
-	//
-	// 	err = helper.HandleError(rw, req, 400, err)
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	//
-	// 	return
-	// }
-	//
-	helper.HandleError(rw, req, 200, nil)
+	database, err := db.Connection()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = database.Query("INSERT INTO organizations (team_name, contact_name, contact_email, contact_phone) VALUES ($1, $2, $3, $4)",
+		organization.TeamName,
+		organization.ContactName,
+		organization.ContactEmail,
+		organization.ContactPhone,
+	)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	err = database.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	helper.OrganizationResponse(rw, req, 200, organization, nil)
 }
