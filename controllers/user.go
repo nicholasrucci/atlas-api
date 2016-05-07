@@ -28,20 +28,16 @@ func CreateUser(rw http.ResponseWriter, req *http.Request) {
 
 	body, err := ioutil.ReadAll(io.LimitReader(req.Body, 1048576))
 	if err != nil {
-		log.Fatal(err)
+		helper.UserResponse(rw, req, 200, user, err)
+		return
 	}
 	if err := req.Body.Close(); err != nil {
-		log.Fatal(err)
+		helper.UserResponse(rw, req, 200, user, err)
+		return
 	}
 
 	if err := json.Unmarshal(body, &userReq); err != nil {
-		helper.JSONHandler(rw, req)
-
-		rw.WriteHeader(422)
-		err = json.NewEncoder(rw).Encode(err)
-		if err != nil {
-			log.Fatal(err)
-		}
+		helper.UserResponse(rw, req, 200, user, err)
 		return
 	}
 
@@ -58,7 +54,8 @@ func CreateUser(rw http.ResponseWriter, req *http.Request) {
 
 	database, err := db.Connection()
 	if err != nil {
-		log.Fatal(err)
+		helper.UserResponse(rw, req, 200, user, err)
+		return
 	}
 
 	_, err = database.Query("INSERT INTO users(first_name, last_name, email, password_hash, password_salt, disabled) VALUES($1, $2, $3, $4, $5, $6)",
@@ -70,13 +67,16 @@ func CreateUser(rw http.ResponseWriter, req *http.Request) {
 		false,
 	)
 	if err != nil {
-		log.Fatal(err)
+		helper.UserResponse(rw, req, 200, user, err)
+		database.Close()
 		return
 	}
 
+	err = database.Close()
 	if err != nil {
-		database.Close()
+		helper.UserResponse(rw, req, 200, user, err)
+		return
 	}
 
-	helper.HandleError(rw, req, 200, nil)
+	helper.UserResponse(rw, req, 200, user, err)
 }
