@@ -33,28 +33,30 @@ func Authenticate(rw http.ResponseWriter, req *http.Request) {
 
 	body, err := ioutil.ReadAll(io.LimitReader(req.Body, 1048576))
 	if err != nil {
-		log.Fatal(err)
+		helper.UserResponse(rw, req, 500, user, err)
+		return
 	}
 
 	err = req.Body.Close()
 	if err != nil {
-		log.Fatal(err)
+		helper.UserResponse(rw, req, 500, user, err)
+		return
 	}
 
 	if err = json.Unmarshal(body, &data); err != nil {
-		helper.HandleError(rw, req, 500, err)
+		helper.UserResponse(rw, req, 500, user, err)
 		return
 	}
 
 	database, err := db.Connection()
 	if err != nil {
-		helper.HandleError(rw, req, 500, err)
+		helper.UserResponse(rw, req, 500, user, err)
 		return
 	}
 
 	rows, err := database.Query("SELECT * FROM users WHERE email=$1", data.Email)
 	if err != nil {
-		helper.HandleError(rw, req, 500, err)
+		helper.UserResponse(rw, req, 500, user, err)
 		return
 	}
 	defer rows.Close()
@@ -68,19 +70,14 @@ func Authenticate(rw http.ResponseWriter, req *http.Request) {
 
 	err = database.Close()
 	if err != nil {
-		helper.HandleError(rw, req, 500, err)
+		helper.UserResponse(rw, req, 500, user, err)
 		return
 	}
 
 	if err = helper.Compare(data.Password, user); err != nil {
-		helper.HandleError(rw, req, 500, err)
+		helper.UserResponse(rw, req, 500, user, err)
 		return
 	}
 
-	helper.JSONHandler(rw, req)
-	rw.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(rw).Encode(data)
-	if err != nil {
-		log.Fatal(err)
-	}
+	helper.UserResponse(rw, req, 500, user, err)
 }
