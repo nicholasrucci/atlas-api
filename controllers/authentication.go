@@ -7,8 +7,8 @@ import (
 	"log"
 	"net/http"
 
-	// "atlas-api/config/db"
 	"atlas-api/config/schema"
+	"atlas-api/db"
 	"atlas-api/helpers"
 )
 
@@ -25,8 +25,11 @@ type AuthenticatePostData struct {
 // Email. It will then hash the requested password with the existing
 // salt and compare the two.
 func Authenticate(rw http.ResponseWriter, req *http.Request) {
-	var data AuthenticatePostData
-	var user schema.User
+	var (
+		data   AuthenticatePostData
+		user   schema.User
+		userID int
+	)
 
 	body, err := ioutil.ReadAll(io.LimitReader(req.Body, 1048576))
 	if err != nil {
@@ -43,10 +46,31 @@ func Authenticate(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// if err = db.DB.Where("email = ?", data.Email).Find(&user).Error; err != nil {
-	// 	helper.HandleError(rw, req, 400, err)
-	// 	return
-	// }
+	database, err := db.Connection()
+	if err != nil {
+		helper.HandleError(rw, req, 500, err)
+		return
+	}
+
+	rows, err := database.Query("SELECT * FROM users WHERE email=$1", data.Email)
+	if err != nil {
+		helper.HandleError(rw, req, 500, err)
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&userID, &user.FirstName, &user.LastName, &user.Email, &user.PasswordHash, &user.PasswordSalt, &user.Disabled)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	err = database.Close()
+	if err != nil {
+		helper.HandleError(rw, req, 500, err)
+		return
+	}
 
 	if err = helper.Compare(data.Password, user); err != nil {
 		helper.HandleError(rw, req, 500, err)
