@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	// "atlas-api/config/db"
 	"atlas-api/config/schema"
+	"atlas-api/db"
 	"atlas-api/helpers"
 )
 
@@ -27,34 +27,47 @@ func CreateProject(rw http.ResponseWriter, req *http.Request) {
 
 	body, err := ioutil.ReadAll(io.LimitReader(req.Body, 1048576))
 	if err != nil {
-		helper.ProjectResponse(rw, req, 200, project, nil)
+		helper.CreateResponse(rw, req, 500, nil, err)
 		return
 	}
 	if err := req.Body.Close(); err != nil {
-		helper.ProjectResponse(rw, req, 200, project, nil)
+		helper.CreateResponse(rw, req, 500, nil, err)
 		return
 	}
 
 	if err := json.Unmarshal(body, &projectReq); err != nil {
-		helper.ProjectResponse(rw, req, 200, project, nil)
+		helper.CreateResponse(rw, req, 500, nil, err)
 		return
 	}
 
 	project.Name = projectReq.Name
 	project.Client = projectReq.Client
-	project.SlackChannel = projectReq.SlackChannel
 	project.StartDate = projectReq.StartDate
 	project.OrganizationID = projectReq.OrganizationID
 
-	// if err := db.DB.Create(&project).Error; err != nil {
-	//
-	// 	err = helper.HandleError(rw, req, 400, err)
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	//
-	// 	return
-	// }
+	database, err := db.Connection()
+	if err != nil {
+		helper.CreateResponse(rw, req, 500, nil, err)
+		return
+	}
 
-	helper.ProjectResponse(rw, req, 200, project, nil)
+	// TODO: slack channel in database
+	_, err = database.Query("INSERT INTO projects (name, client, start_date, organization_id) VALUES ($1, $2, $3, $4)",
+		project.Name,
+		project.Client,
+		project.StartDate,
+		project.OrganizationID,
+	)
+	if err != nil {
+		helper.CreateResponse(rw, req, 500, nil, err)
+		return
+	}
+
+	err = database.Close()
+	if err != nil {
+		helper.CreateResponse(rw, req, 500, nil, err)
+		return
+	}
+
+	helper.CreateResponse(rw, req, 200, project, err)
 }
