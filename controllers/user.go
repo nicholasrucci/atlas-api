@@ -28,16 +28,16 @@ func CreateUser(rw http.ResponseWriter, req *http.Request) {
 
 	body, err := ioutil.ReadAll(io.LimitReader(req.Body, 1048576))
 	if err != nil {
-		helper.UserResponse(rw, req, 200, user, err)
+		helper.CreateResponse(rw, req, 500, nil, err)
 		return
 	}
 	if err := req.Body.Close(); err != nil {
-		helper.UserResponse(rw, req, 200, user, err)
+		helper.CreateResponse(rw, req, 500, nil, err)
 		return
 	}
 
 	if err := json.Unmarshal(body, &userReq); err != nil {
-		helper.UserResponse(rw, req, 200, user, err)
+		helper.CreateResponse(rw, req, 500, nil, err)
 		return
 	}
 
@@ -54,7 +54,7 @@ func CreateUser(rw http.ResponseWriter, req *http.Request) {
 
 	database, err := db.Connection()
 	if err != nil {
-		helper.UserResponse(rw, req, 200, user, err)
+		helper.CreateResponse(rw, req, 500, nil, err)
 		return
 	}
 
@@ -67,16 +67,16 @@ func CreateUser(rw http.ResponseWriter, req *http.Request) {
 		false,
 	)
 	if err != nil {
-		helper.UserResponse(rw, req, 200, user, err)
+		helper.CreateResponse(rw, req, 500, nil, err)
 		database.Close()
 		return
 	}
 
 	err = database.Close()
 	if err != nil {
-		helper.UserResponse(rw, req, 200, user, err)
+		helper.CreateResponse(rw, req, 500, nil, err)
 		return
 	}
 
-	helper.UserResponse(rw, req, 200, user, err)
+	helper.CreateResponse(rw, req, 200, user, err)
 }
