@@ -33,30 +33,29 @@ func Authenticate(rw http.ResponseWriter, req *http.Request) {
 
 	body, err := ioutil.ReadAll(io.LimitReader(req.Body, 1048576))
 	if err != nil {
-		helper.UserResponse(rw, req, 500, user, err)
+		helper.CreateResponse(rw, req, 500, nil, err)
 		return
 	}
 
 	err = req.Body.Close()
 	if err != nil {
-		helper.UserResponse(rw, req, 500, user, err)
 		return
 	}
 
 	if err = json.Unmarshal(body, &data); err != nil {
-		helper.UserResponse(rw, req, 500, user, err)
+		helper.CreateResponse(rw, req, 500, nil, err)
 		return
 	}
 
 	database, err := db.Connection()
 	if err != nil {
-		helper.UserResponse(rw, req, 500, user, err)
+		helper.CreateResponse(rw, req, 500, nil, err)
 		return
 	}
 
 	rows, err := database.Query("SELECT * FROM users WHERE email=$1", data.Email)
 	if err != nil {
-		helper.UserResponse(rw, req, 500, user, err)
+		helper.CreateResponse(rw, req, 500, nil, err)
 		return
 	}
 	defer rows.Close()
@@ -70,14 +69,14 @@ func Authenticate(rw http.ResponseWriter, req *http.Request) {
 
 	err = database.Close()
 	if err != nil {
-		helper.UserResponse(rw, req, 500, user, err)
+		helper.CreateResponse(rw, req, 500, nil, err)
 		return
 	}
 
 	if err = helper.Compare(data.Password, user); err != nil {
-		helper.UserResponse(rw, req, 500, user, err)
+		helper.CreateResponse(rw, req, 500, nil, err)
 		return
 	}
 
-	helper.UserResponse(rw, req, 500, user, err)
+	helper.CreateResponse(rw, req, 500, user, err)
 }
