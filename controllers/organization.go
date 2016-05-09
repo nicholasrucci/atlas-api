@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 
 	"atlas-api/config/schema"
@@ -29,16 +28,16 @@ func CreateOrganization(rw http.ResponseWriter, req *http.Request) {
 
 	body, err := ioutil.ReadAll(io.LimitReader(req.Body, 1048576))
 	if err != nil {
-		helper.OrganizationResponse(rw, req, 200, organization, nil)
+		helper.CreateResponse(rw, req, 500, nil, err)
 		return
 	}
 	if err := req.Body.Close(); err != nil {
-		helper.OrganizationResponse(rw, req, 200, organization, nil)
+		helper.CreateResponse(rw, req, 500, nil, err)
 		return
 	}
 
 	if err := json.Unmarshal(body, &organizationReq); err != nil {
-		helper.OrganizationResponse(rw, req, 200, organization, nil)
+		helper.CreateResponse(rw, req, 500, nil, err)
 		return
 	}
 
@@ -49,7 +48,7 @@ func CreateOrganization(rw http.ResponseWriter, req *http.Request) {
 
 	database, err := db.Connection()
 	if err != nil {
-		log.Fatal(err)
+		helper.CreateResponse(rw, req, 500, nil, err)
 	}
 
 	_, err = database.Query("INSERT INTO organizations (team_name, contact_name, contact_email, contact_phone) VALUES ($1, $2, $3, $4)",
@@ -59,14 +58,14 @@ func CreateOrganization(rw http.ResponseWriter, req *http.Request) {
 		organization.ContactPhone,
 	)
 	if err != nil {
-		log.Fatal(err)
+		helper.CreateResponse(rw, req, 500, nil, err)
 		return
 	}
 
 	err = database.Close()
 	if err != nil {
-		log.Fatal(err)
+		helper.CreateResponse(rw, req, 500, nil, err)
 	}
 
-	helper.OrganizationResponse(rw, req, 200, organization, nil)
+	helper.CreateResponse(rw, req, 200, organization, nil)
 }
