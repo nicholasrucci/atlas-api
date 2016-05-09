@@ -28,7 +28,7 @@ type Project struct {
 	SlackChannel   string
 	StartDate      string
 	OrganizationID int
-	Organization   Organization
+	Organization   Organization `json:"-"`
 	Platforms      []Platform
 	Pages          []Page
 	Tasks          []Task

@@ -4,19 +4,70 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"strconv"
 
 	"atlas-api/config/schema"
 	"atlas-api/db"
 	"atlas-api/helpers"
+
+	"github.com/gorilla/mux"
 )
 
 // OrganizationReq ...
 type OrganizationReq struct {
-	TeamName     string `json:"teamName"`
-	ContactName  string `json:"contactName"`
-	ContactEmail string `json:"contactEmail"`
-	ContactPhone string `json:"contactPhone"`
+	ID           int
+	TeamName     string           `json:"teamName"`
+	ContactName  string           `json:"contactName"`
+	ContactEmail string           `json:"contactEmail"`
+	ContactPhone string           `json:"contactPhone"`
+	Projects     []schema.Project `json:"projects"`
+}
+
+// GetOrganization will get the current organization
+func GetOrganization(rw http.ResponseWriter, req *http.Request) {
+	var (
+		organization schema.Organization
+		name         string
+		client       string
+		startDate    string
+		junk         string
+	)
+	vars := mux.Vars(req)
+	organizationID := vars["id"]
+	oid, _ := strconv.Atoi(organizationID)
+
+	database, err := db.Connection()
+	if err != nil {
+		helper.CreateResponse(rw, req, 500, nil, err)
+	}
+
+	rows, err := database.Query("SELECT * FROM organizations INNER JOIN projects on organizations.id=projects.organization_id WHERE organizations.id=$1", organizationID)
+	if err != nil {
+		helper.CreateResponse(rw, req, 500, nil, err)
+		return
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&junk, &organization.TeamName, &organization.ContactName, &organization.ContactEmail, &organization.ContactPhone, &junk, &name, &client, &startDate, &junk)
+		if err != nil {
+			log.Fatal(err)
+		}
+		project := schema.Project{name, client, "", startDate, oid, organization, nil, nil, nil, nil, nil}
+		organization.Projects = append(organization.Projects, project)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer database.Close()
+
+	helper.CreateResponse(rw, req, 200, organization, nil)
 }
 
 // CreateOrganization will create a new project
